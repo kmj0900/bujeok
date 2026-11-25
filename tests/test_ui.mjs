@@ -33,6 +33,10 @@ check('선택 가능한 맵 id가 모두 maps.js에 있고 서로 다르다', MA
 check('완성된 맵(깊은 숲·폭포 계곡)은 모두 선택 가능', Object.keys(MAPS).every((id) => MAP_CHOICES.some((m) => m.id === id)));
 check('맵마다 위협 설명 문구가 있다', MAP_CHOICES.every((m) => m.label && m.hint));
 
+console.log('대결 방식 화면(AI 난이도)');
+check('대결 방식: 로컬·AI 쉬움·AI 보통·뒤로 4개', SCREENS.mode.items.length === 4 && SCREENS.mode.items[0].includes('로컬') && SCREENS.mode.items[1].includes('쉬움') && SCREENS.mode.items[2].includes('보통') && SCREENS.mode.items[3] === '뒤로');
+check('대결 방식 마지막 버튼 아래에 안내 문구(y=358) 자리가 있다', screenRects('mode').at(-1).y + BUTTON.h < 358);
+
 console.log('맵별 타일 시트');
 const fakeImg = (name) => ({ name, complete: true, naturalWidth: 320 });
 const sprites = { tiles: fakeImg('forest'), tilesWaterfall: fakeImg('waterfall') };

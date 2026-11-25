@@ -27,6 +27,7 @@ let pendingSeed = seedParam !== null ? Number(seedParam) : undefined;
 // ?mode=ai|local 은 개발용 바로가기: 메뉴를 건너뛰고 해당 모드로 바로 시작한다.
 const modeParam = params.get('mode');
 let mode = modeParam === 'ai' ? 'ai' : 'local';
+let aiLevel = params.get('level') === 'easy' ? 'easy' : 'normal'; // ?level=easy 는 개발용 바로가기(AI 난이도). 메뉴에서는 쉬움·보통을 고른다
 
 // ?hazard=3 은 개발용 바로가기: 첫 수리검을 시작 3초 뒤에 나오게 한다(이후 간격은 그대로).
 const hazardParam = Number(params.get('hazard'));
@@ -73,15 +74,16 @@ try {
     map = loadMap(MAPS[selectedMapId], pendingSeed);
     pendingSeed = undefined;
     game = createGame(map, { hazardStart, startTime });
-    ai = createAI(1, createRng((map.seed + 7) >>> 0)); // AI는 2P(녹림)를 조종한다
+    ai = createAI(0, createRng((map.seed + 7) >>> 0), aiLevel); // AI는 1P(흑영)를 조종하고, 사람은 2P(녹림, 방향키+Enter)로 오른손 조작을 한다(2026-11-25 사용자 요청)
     input.clear();
     acc = 0;
     lastPhase = game.phase;
-    status.textContent = `${mode === 'ai' ? 'AI 대전' : '로컬 2인'} | ${map.def.name} | 시드 ${map.seed} | 상자 ${map.crateCount}/${map.candidateCount}칸`;
+    status.textContent = `${mode === 'ai' ? (aiLevel === 'easy' ? 'AI 대전(쉬움)' : 'AI 대전(보통)') : '로컬 2인'} | ${map.def.name} | 시드 ${map.seed} | 상자 ${map.crateCount}/${map.candidateCount}칸`;
     console.log('map loaded', { mode, seed: map.seed, crates: map.crateCount, candidates: map.candidateCount });
   }
-  function startGame(newMode) {
+  function startGame(newMode, level = 'normal') {
     mode = newMode;
+    aiLevel = level;
     scene = 'game';
     newRound();
   }
@@ -110,7 +112,8 @@ try {
       input.clear();
     } else if (screen === 'mode') {
       if (i === 0) startGame('local');
-      else if (i === 1) startGame('ai');
+      else if (i === 1) startGame('ai', 'easy');
+      else if (i === 2) startGame('ai', 'normal');
       else { scene = 'map'; input.clear(); } // 뒤로: 맵 선택으로
     } else if (screen === 'pause') {
       if (i === 0) { resume(game); input.clear(); }
@@ -156,7 +159,7 @@ try {
     else if (down) menuIndex = wrapIndex(menuIndex, 1, count);
     if (select) return activate(screen, menuIndex);
     if (screen === 'map' && esc) return activate('map', MAP_CHOICES.length); // 뒤로: 메인 화면
-    if (screen === 'mode' && esc) return activate('mode', 2); // 뒤로: 맵 선택
+    if (screen === 'mode' && esc) return activate('mode', 3); // 뒤로: 맵 선택
     if (screen === 'pause' && (esc || pauseKey)) return activate('pause', 0); // 계속하기
     if ((screen === 'pause' || screen === 'result') && restart) return newRound();
   }
@@ -181,7 +184,8 @@ try {
       if (input.consumePause() && game.phase === Phase.PLAYING) { pause(game); input.clear(); }
       // 사람과 AI가 같은 형태의 액션을 쓴다. 입력은 카운트다운·플레이 중에만 읽어 Enter/Space가 메뉴에 남도록 한다.
       while (acc >= STEP) {
-        updateGame(game, [input.getAction(0), mode === 'ai' ? ai.getAction(game, STEP) : input.getAction(1)]);
+        const p1 = input.getAction(0); // AI 대전에서도 읽어서 눌린 키를 비운다(WASD는 무시)
+        updateGame(game, [mode === 'ai' ? ai.getAction(game, STEP) : p1, input.getAction(1)]);
         acc -= STEP;
       }
       for (const e of game.events) sound.play(e); // 이번 프레임에 생긴 이벤트를 소리로
@@ -211,8 +215,8 @@ try {
     }
 
     if (scene === 'game' && game) {
-      hudP1.innerHTML = hudHtml(game.players[0], false);
-      hudP2.innerHTML = hudHtml(game.players[1], mode === 'ai');
+      hudP1.innerHTML = hudHtml(game.players[0], mode === 'ai');
+      hudP2.innerHTML = hudHtml(game.players[1], false);
       hudTime.textContent = formatTime(game.timeLeft);
       hudTime.classList.toggle('low', game.phase === Phase.PLAYING && game.timeLeft <= 30); // 남은 30초부터 붉게 깜박
     } else {
