@@ -1,6 +1,6 @@
 // 키 입력. e.code를 사용하므로 한글 IME 상태에서도 같은 키로 인식한다.
 export const CONTROLS = [
-  { up: 'KeyW', down: 'KeyS', left: 'KeyA', right: 'KeyD', bomb: 'Space' },        // 1P
+  { up: 'KeyW', down: 'KeyS', left: 'KeyA', right: 'KeyD', bomb: 'Space', bombAlt: 'ShiftLeft' }, // 1P (WASD+Space 동시 입력이 키보드에서 씹히는 경우를 위해 왼쪽 Shift도 부적 키)
   { up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight', bomb: 'Enter' }, // 2P
 ];
 
@@ -47,7 +47,7 @@ export function createInput(target = window) {
       // struggle: 이동키를 새로 누른 순간(봉인 탈출 연타용). 매 스텝 소비해 오래된 입력이 쌓이지 않게 한다
       let struggle = false;
       for (const k of [keys.up, keys.down, keys.left, keys.right]) if (pressedOnce.delete(k)) struggle = true;
-      return { move: resolveDirection(held, keys), placeBomb: pressedOnce.delete(keys.bomb), struggle };
+      return { move: resolveDirection(held, keys), placeBomb: [keys.bomb, keys.bombAlt].filter(Boolean).map((k) => pressedOnce.delete(k)).some(Boolean), struggle };
     },
     consumePause() { // P 또는 Esc. 둘 다 눌렸어도 한 번만 인정한다
       const p = pressedOnce.delete(PAUSE_KEY);
