@@ -25,7 +25,7 @@ HTML5 / CSS3 / Vanilla JavaScript (ES Modules) / Canvas 2D. GitHub + Render Stat
 
 ## 시작 방법
 정적 파일을 로컬 HTTP 서버로 제공해 `index.html`을 실행한다. ES Modules를 사용하므로 `file://`로 직접 열지 않는다. VS Code Live Server 등을 사용한다.
-- 조작: 1P 흑영 `W A S D` + `Space`(부적), 2P 녹림 `방향키` + `Enter`(부적), `P`/`Esc` 일시정지, `M` 소리 끄기·켜기. 메뉴는 `↑↓`(또는 W/S) + `Enter`/`Space`, 마우스.
+- 조작: 1P 흑영 `W A S D` + `Space` 또는 왼쪽 `Shift`(부적), 2P 녹림 `방향키` + `Enter`(부적), `P`/`Esc` 일시정지, `M` 소리 끄기·켜기. 메뉴는 `↑↓`(또는 W/S) + `Enter`/`Space`, 마우스.
 - 개발용 주소 옵션: `?mode=ai` / `?mode=local`(메뉴 건너뛰기), `?seed=숫자`(첫 판 상자 배치 재현), `?hazard=3`(첫 수리검·물살·낙석을 시작 3초 뒤에 나오게 해 확인), `?t=100`(경과 시간을 앞당겨 후반 단계 확인, 예: 2칸·3칸 물살), `?map=forest|waterfall|mountain`(처음 선택될 맵. 평소엔 메인 → 맵 선택 화면에서 고른다).
 - 테스트: `node tests/test_move.mjs` 등 `tests/*.mjs`를 각각 실행한다.
 - 스프라이트 재생성(선택): `pip install pillow` 후 `python tools/make_sprites.py`. 게임 실행에는 필요 없다.

@@ -135,7 +135,7 @@ export function drawMainMenu(ctx, sprites, index) {
   bigNinja(ctx, sprites && sprites.ninja[1], NINJA_ROW.left, W - 22 - CELL * 3, 180, 3);
   drawButtons(ctx, 'menu', index);
   woodBoard(ctx, 34, 314, W - 68, 66);
-  label(ctx, '1P 흑영: W A S D 이동 · Space 부적', W / 2, 338, 13, '#f2e9d0', '#3a220e');
+  label(ctx, '1P 흑영: W A S D 이동 · Space/Shift 부적', W / 2, 338, 13, '#f2e9d0', '#3a220e');
   label(ctx, '2P 녹림: 방향키 이동 · Enter 부적', W / 2, 357, 13, '#f2e9d0', '#3a220e');
   label(ctx, 'P / Esc 일시정지 · 부적으로 상대를 봉인하라!', W / 2, 373, 11, '#ffe9a8', '#3a220e');
 }
